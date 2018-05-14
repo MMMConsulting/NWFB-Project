@@ -112,7 +112,7 @@ def select_furniture_records(cursor):
         downloadTime = time.time()
         downloadTime = datetime.datetime.fromtimestamp(downloadTime).strftime('%Y-%m-%d %H:%M:%S')
         print(downloadTime)
-        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests_items"
+        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests_items WHERE REQUESTED > 0;"
         print(furniture_query)
         cursor.execute(furniture_query)
         row_values = []
