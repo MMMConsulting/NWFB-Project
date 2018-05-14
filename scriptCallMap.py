@@ -14,6 +14,7 @@ import pandas as pd
 from pandas import DataFrame as df
 import callWebPage as cwp, logs, databasePull3 as db,contactUpload as cp, lineItemScriptv3 as lis, firstFormatFile_two as fff
 import time 
+import datetime
 janeDoe = r"C:\temp\NWFB\sampleData\janeDoe.csv"
 
 '''
@@ -31,9 +32,13 @@ cursor = db.connect_to_db(db.host_name, db.user_name, db.pass_word, db.database,
 dataSet = db.select_client_records(cursor)
 furniture_items = db.select_furniture_records(cursor)
 
-theTime = df(columns = {'time'})
-theTime.loc[0,'time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
-theTime['time'] = theTime['time'].values[0].replace(' ','T')
+datetime.datetime.now()
+
+#fmt = '%Y-%m-%d %H:%M:%S'
+#theTime = df(columns = {'time'})
+#theTime.loc[0,'time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+theTime['time'] = datetime.datetime.now()
+
 
 if len(dataSet) == 0:
     print("No new records... Closing Application")
@@ -58,7 +63,7 @@ Step 4 - Upload New Contacts to Salesforce
         -Call the Contact Upload script
 '''
 
-contact.to_csv(r"C:\temp\NWFB\uploads\contacts\archive\contacts-"+str(theTime['time'][0][0:10])+".csv",sep=',',encoding = 'iso-8859-1')
+contact.to_csv(r"C:\temp\NWFB\uploads\contacts\archive\contacts-"+str(theTime['time'])[0:10]+".csv",sep=',',encoding = 'iso-8859-1')
 contact.to_csv(r"C:\temp\NWFB\uploads\contacts\contactsFile.csv",sep=',',encoding = 'iso-8859-1')
 cp.callUploadContact(cp.opDir)
 
@@ -81,6 +86,29 @@ cp.callUploadTransaction(cp.opDir)
 cp.callDownloadOpportunity(cp.opDir)
 opportunityId = pd.read_csv(r"C:\temp\NWFB\downloads\Opportunity\opportunity.csv",sep=',',encoding='iso-8859-1')
 opportunityId = opportunityId.set_index('SIGNUP_ID__C').copy()
+opportunityId['tooOld'] = 0
+for index, item in opportunityId.iterrows():
+    opportunityId.loc[index,'CREATEDDATE'] = opportunityId.loc[index,'CREATEDDATE'][0:-5]
+    opportunityId.loc[index,'CREATEDDATE'] = opportunityId.loc[index,'CREATEDDATE'].replace("T"," ")
+    opportunityId.loc[index,'CREATEDDATE'] = opportunityId.loc[index,'CREATEDDATE'].replace("T"," ")
+    opportunityId.loc[index,'CREATEDDATE'] = datetime.datetime.strptime(opportunityId.loc[index,'CREATEDDATE'],fmt)
+    opportunityId.loc[index,'CREATEDDATE'] = opportunityId.loc[index,'CREATEDDATE'] - datetime.timedelta(hours=7)
+#    opportunityId.loc[index,'CREATEDDATE'] = time.strftime("%Y-%m-%d %H:%M:%S", opportunityId.loc[index,'CREATEDDATE'])
+    opp_time = opportunityId.loc[index,'CREATEDDATE']
+    opp_time = time.mktime(opp_time.timetuple())
+    timetime = theTime['time'][0]
+    timetime = time.mktime(timetime.timetuple())
+    daysdiff = opp_time - timetime
+    minutesdiff = daysdiff / 60
+    if minutesdiff > 12:
+        print(opportunityId.loc[index,'CREATEDDATE'])
+        print(theTime['time'])
+        print(minutesdiff)
+        opportunityId.loc[index,'tooOld'] = 1
+    else:
+        pass
+
+opportunityId = opportunityId[opportunityId['tooOld'] == 0]
 
 '''
 Step 6 - Upload Product line Items
@@ -106,7 +134,7 @@ Step 7 - Clean up and Logging
         -Wrap the uploaded contacts,opps, and non-confidential info into a google sheet for review
 '''
 
-logs.general_logs(theTime['time'][0],contact)
+logs.general_logs(theTime['time'],contact)
 
 
 
