@@ -40,7 +40,7 @@ a = conn.cursor()
 #a.execute("SELECT * FROM nwfurnit_furniturerequests.furniture_requests ORDER BY CREATED DESC LIMIT 1;")
 #a.execute("SELECT * FROM nwfurnit_furniturerequests.furniture_requests WHERE ID = 95 AND LENGTH(FIRSTNAME) > 0 AND LENGTH(CaseworkerName) > 5 AND DOWNLOADED = 0 ;")
 #a.execute("SELECT * FROM nwfurnit_furniturerequests.furniture_requests_items WHERE ID = 280;")
-#a.execute("SELECT LAST_UPDATED FROM nwdblive_furniturerequests.furniture_requests WHERE downloaded = 0;")
+a.execute("SELECT LAST_UPDATED FROM nwdblive_furniturerequests.furniture_requests WHERE downloaded = 0;")
 #a.execute("SHOW PROCESSLIST")
 #a.execute("KILL 311545;")
 #a.execute("UPDATE nwfurnit_furniturerequests.furniture_requests SET BirthDate = '1977-06-25' WHERE ID = 95; COMMIT;")
@@ -79,7 +79,7 @@ def select_client_records(cursor):
         downloadTime = time.time()
         downloadTime = datetime.datetime.fromtimestamp(downloadTime).strftime('%Y-%m-%d %H:%M:%S')
         print(downloadTime)
-        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE birthdate >= '1900-01-01' AND DOWNLOADED = 0 AND LENGTH(CASEWORKERNAME) > 4;"
+        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE birthdate >= '1900-01-01' AND DOWNLOADED = 0 AND LENGTH(CASEWORKERNAME) > 4 LIMIT 5;"
 #        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE ID = 99;"
    
         print(furniture_query)
@@ -95,7 +95,19 @@ def select_client_records(cursor):
         for item2 in row.keys(): #Extracting Columns
             column_values.insert(0,item2)
         outputdf = df(data = output_data, columns = column_values)
-        outputdf['CloseDate'] = [str(str(item.SUBMITTED_DATETIME.year)+'-'+str(item.SUBMITTED_DATETIME.month)+'-'+str(item.SUBMITTED_DATETIME.day)) for index, item in outputdf.iterrows() ]
+        for index, row in outputdf.iterrows():
+            if type(row['WILL_CALL_DELIVERY_DATE']) != pd._libs.tslib.NaTType and row['WILL_CALL_DELIVERY_DATE'] != '0000-00-00' and row['WILL_CALL_DELIVERY_DATE'] != None:
+                outputdf.loc[index,'CloseDate'] = str(str(row.WILL_CALL_DELIVERY_DATE.year)+'-'+str(row.WILL_CALL_DELIVERY_DATE.month)+'-'+str(row.WILL_CALL_DELIVERY_DATE.day))
+            elif type(row['DELIVERY_DATE']) != pd._libs.tslib.NaTType and row['DELIVERY_DATE'] != '0000-00-00' and row['DELIVERY_DATE'] != 'None' and row['DELIVERY_DATE'] != None:
+                outputdf.loc[index,'CloseDate'] = str(str(row.DELIVERY_DATE.year)+'-'+str(row.DELIVERY_DATE.month)+'-'+str(row.DELIVERY_DATE.day))
+            elif row['SHOP_DATE'] != None and row['SHOP_DATE'] != '0000-00-00':
+                print(row.SHOP_DATE)
+                outputdf.loc[index,'CloseDate'] = str(str(row.SHOP_DATE.year)+'-'+str(row.SHOP_DATE.month)+'-'+str(row.SHOP_DATE.day))
+            else:
+                print(row.SUBMITTED_DATETIME)
+                print(index)
+                outputdf.loc[index,'CloseDate'] = str(str(row.CREATED.year)+'-'+str(row.CREATED.month)+'-'+str(row.CREATED.day))
+#        outputdf['CloseDate'] = [str(str(item.SUBMITTED_DATETIME.year)+'-'+str(item.SUBMITTED_DATETIME.month)+'-'+str(item.SUBMITTED_DATETIME.day)) for index, item in outputdf.iterrows() ]
         outputdf = outputdf.set_index(outputdf['ID'])
     except UnboundLocalError:
         print("No New Records")
