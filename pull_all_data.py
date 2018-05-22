@@ -63,7 +63,7 @@ def select_client_records(cursor):
         downloadTime = time.time()
         downloadTime = datetime.datetime.fromtimestamp(downloadTime).strftime('%Y-%m-%d %H:%M:%S')
         print(downloadTime)
-        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE DOWNLOADED = 0;"
+        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests;"
         print(furniture_query)
         cursor.execute(furniture_query)
         row_values = []
@@ -77,7 +77,19 @@ def select_client_records(cursor):
         for item2 in row.keys(): #Extracting Columns
             column_values.insert(0,item2)
         outputdf = df(data = output_data, columns = column_values)
-        records['CloseDate'] = [str(str(item.SUBMITTED_DATETIME.year)+'-'+str(item.SUBMITTED_DATETIME.month)+'-'+str(item.SUBMITTED_DATETIME.day)) for index, item in records.iterrows() ]
+        for index, row in outputdf.iterrows():
+            if type(row['WILL_CALL_DELIVERY_DATE']) != pd._libs.tslib.NaTType and row['WILL_CALL_DELIVERY_DATE'] != '0000-00-00' and row['WILL_CALL_DELIVERY_DATE'] != None:
+                outputdf.loc[index,'CloseDate'] = str(str(row.WILL_CALL_DELIVERY_DATE.year)+'-'+str(row.WILL_CALL_DELIVERY_DATE.month)+'-'+str(row.WILL_CALL_DELIVERY_DATE.day))
+            elif type(row['DELIVERY_DATE']) != pd._libs.tslib.NaTType and row['DELIVERY_DATE'] != '0000-00-00' and row['DELIVERY_DATE'] != 'None' and row['DELIVERY_DATE'] != None:
+                outputdf.loc[index,'CloseDate'] = str(str(row.DELIVERY_DATE.year)+'-'+str(row.DELIVERY_DATE.month)+'-'+str(row.DELIVERY_DATE.day))
+            elif row['SHOP_DATE'] != None and row['SHOP_DATE'] != '0000-00-00':
+                print(row.SHOP_DATE)
+                outputdf.loc[index,'CloseDate'] = str(str(row.SHOP_DATE.year)+'-'+str(row.SHOP_DATE.month)+'-'+str(row.SHOP_DATE.day))
+            else:
+                print(row.SUBMITTED_DATETIME)
+                print(index)
+                outputdf.loc[index,'CloseDate'] = str(str(row.CREATED.year)+'-'+str(row.CREATED.month)+'-'+str(row.CREATED.day))
+#        outputdf['CloseDate'] = [str(str(item.SUBMITTED_DATETIME.year)+'-'+str(item.SUBMITTED_DATETIME.month)+'-'+str(item.SUBMITTED_DATETIME.day)) for index, item in outputdf.iterrows() ]
         outputdf = outputdf.set_index(outputdf['ID'])
     except UnboundLocalError:
         print("No New Records")
@@ -123,9 +135,10 @@ def select_furniture_records(cursor):
 cur = connect_to_db(host_name,user_name,pass_word,database,charset,cursorclass)
 
 records = select_client_records(cur)
+#furniture_records = select_furniture_records(cur)
 
 #furniture.to_csv(r"C:/users/marti/desktop/test_db_output.csv",sep=',',encoding = 'iso-8859-1')
-records.to_csv(r"C:/users/micha/desktop/test_db_output_records.csv",sep=',',encoding = 'iso-8859-1')
+#records.to_csv(r"C:/users/micha/desktop/test_db_output_records.csv",sep=',',encoding = 'iso-8859-1')
 
 # Matches records that have been produced through the webapp sign up flow to those in salesforce and produces a list
 def upload_verification(contact_df,client_query_output):
