@@ -19,9 +19,10 @@ productDetails = pd.read_csv(r"C:/temp/NWFB/dataDependencies/productDetails_2.cs
 
 def lineItemPrep(lineItemDF,productDetails,opportunityId):
     lineItemDF['opportunityId'] = ''
-    
+    opportunityId.index = opportunityId.index.map(str)
+    lineItemDF.index = lineItemDF.index.map(str)
     pre_output = pd.merge(lineItemDF\
-                          , opportunityId[['OPPORTUNITYID','CREATEDDATE']]\
+                          , opportunityId[['Id','CreatedDate']]\
                           , how='inner'\
                           , left_index=True\
                           , right_index=True\
