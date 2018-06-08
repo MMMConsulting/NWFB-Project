@@ -117,6 +117,7 @@ def contactFormat(dataset):
                                 ,'Will_Call_Delivery__c':''
                                 ,'Will_Call_Delivery_Shopper__c':''
                                 ,'HMIS__c':''
+                                ,'to_be_dropped':''
                                 }, index = dataset.ID
                     )
     dataset = dataset.dropna(axis = 0, how = 'all')
@@ -194,7 +195,7 @@ def contactFormat(dataset):
         contactRecord.loc[index2,'Delivery__c'] = dataset.loc[index2,'DELIVERY']
 #        contactRecord.loc[index2,'CASEWORKER_EMAIL'] = dataset.loc[index2,'CASEWORKER_EMAIL']
 #        contactRecord.loc[index2,'CASEWORKER_PHONE'] = dataset.loc[index2,'CASEWORKER_PHONE']
-        contactRecord.loc[index2,'Caseworker_Name__c'] = dataset.loc[index2,'CaseworkerName']
+ #       contactRecord.loc[index2,'Caseworker_Name__c'] = dataset.loc[index2,'CaseworkerName']
         contactRecord.loc[index2,'Other_Payee_Name__c'] = dataset.loc[index2,'OTHER_PAYEE_FIRST'] + " " + dataset.loc[index2,'OTHER_PAYEE_LAST']
         contactRecord.loc[index2,'signup_id__c'] = dataset.loc[index2,'ID']
 #        contactRecord.loc[index2,'PAID_BY_CLIENT__C_METHOD'] = dataset.loc[index2,'PAID_BY_CLIENT__C_METHOD']
@@ -234,8 +235,7 @@ def contactFormat(dataset):
             contactRecord.loc[ix,'Homeless_In_The_Last_Month__c'] = 'true'
         else:
             contactRecord.loc[ix,'Homeless_In_The_Last_Month__c'] = 'false'
-        ''' ****** REMOVE THIS IN OTHERS TESTS ****** '''
- #       contactRecord['Caseworker_Name__c'] = '003A000001xAcDN'
+
     return contactRecord
 
 
