@@ -11,13 +11,14 @@ Call map for all scripts involved in the Webform to Salesforce automation
 import sys
 sys.path.append('c:/temp/NWFB/scripts/etl')
 
+import numpy as np
 import pandas as pd
 from pandas import DataFrame as df
 import logs, databasePull3 as db, sf_queries as sfq, sf_inserts as sfi, lineItemScriptv3 as lis, firstFormatFile_two as fff
 import time 
 import datetime
 
-sandbox = True
+sandbox = False
 
 '''
 Step 1 - Security function for easy use...
@@ -55,13 +56,13 @@ for idx, row in dataSet.iterrows():
 
 
 
-if len(dataSet[dataSet['to_be_dropped'] == 0]) == 0:
-    print("No new records... Closing Application")
+#if len(dataSet[dataSet['to_be_dropped'] == 0]) == 0:
+#    print("No new records... Closing Application")
 #    theTime.to_csv(r"c:/users/martimi/desktop/thetime.csv",sep=',',encoding='8859-1')
-    exit()
-else:
-    print("Running Application")
-    pass
+#    exit()
+#else:
+#    print("Running Application")
+#    pass
 '''
 Step 3 - Call Format function - Format new data and pass to the next function
       -Format three DFs linked by a common index Primary Key
@@ -84,18 +85,21 @@ contact.to_csv(r"C:\temp\NWFB\uploads\contacts\contactsFile.csv",sep=',',encodin
 
 
 ''' for testing purposes only'''
-contact['AccountId'] = '0011F000007Y9hzQAC'
-contact['Caseworker_Name__c'] = '0031F000004RzwE'
+#contact['AccountId'] = '0011F000007Y9hzQAC'
+#contact['Caseworker_Name__c'] = '0031F000004RzwE'
 
-contact_upload = contact.drop(['CloseDate'], axis = 1)
+#contact = contact[contact_upload['to_be_dropped'] == 0]
+
+contact_upload = contact.drop(['CloseDate','to_be_dropped'], axis = 1)
 
 ''' remove contacts already in the system''' 
-contact_upload = contact_upload[contact_upload['to_be_dropped'] == 0]
+
 
 login = sfi.instance_login(sandbox)
 contact_upload = sfi.cleaning_pandas(contact_upload)
 con_results = sfi.insert_job(login, "Contact",contact_upload)
 print(con_results)
+
 '''
 Step 5 - Upload New Opportunities
          -Pull last X contact records from salesforce
@@ -134,6 +138,7 @@ print(opp_results)
 
 c_bulk, c_batch = sfq.bulk_query('Opportunity',sfq.prod_opportunity_query,sandbox)
 opportunityId = sfq.format_dictionary(c_bulk,c_batch)
+opportunityId = opportunityId.set_index('signup_id__c')
 
 
 '''
@@ -143,14 +148,43 @@ Step 6 - Upload Product line Items
          -Call ProductLine Items upload script
 '''
 
+
 lineItemPrep = lis.lineItemPrep(furniture_items,lis.productDetails,opportunityId)
 lineItemFinal = lis.lineitemprep2(lineItemPrep,lis.productDetails)
 lineItemFinal.to_csv(r"C:\temp\NWFB\uploads\lineitems\lineitems.csv",sep=',',encoding='iso-8859-1',index=False)
 
+lineItemUpload = df ( columns = {
+                                        'OpportunityId': lineItemFinal['Id']
+                                        ,'PricebookEntryId': lineItemFinal['PricebookEntryId']
+#                                        ,'Requested__c': lineItemFinal['REQUESTED']
+                                        ,'Status__c': lineItemFinal['STATUS']
+#                                        ,'Declined__c ': lineItemFinal['Declined__c']
+#                                        ,'N_A__c': lineItemFinal['N_A__c']
+#                                        ,'Product2Id':''
+#                                        ,'Received__c':''
+                                    })
+    
+lineItemUpload['OpportunityId'] = lineItemFinal['Id']
+lineItemUpload['PricebookEntryId'] = lineItemFinal['PricebookEntryId']
+lineItemUpload['Requested__c']= lineItemFinal['REQUESTED']
+lineItemUpload['Status__c'] = lineItemFinal['STATUS']
+#lineItemUpload['Product2Id'] = lineItemFinal['Product2Id']
+lineItemUpload['Declined__c'] = lineItemFinal['Declined__c']
+lineItemUpload['N_A__c'] = lineItemFinal['N_A__c']
+lineItemUpload['Received__c'] = lineItemFinal['PROVIDED']
 
+lineItemUpload['Declined__c'] = np.where(lineItemUpload['Declined__c'] == 1, 'true','false')
+lineItemUpload['N_A__c'] = np.where(lineItemUpload['N_A__c'] == 1, 'true','false')
+lineItemUpload['Status__c'] = np.where(lineItemUpload['Status__c'] == 'Declined',' ',lineItemUpload['Status__c'])
+lineItemUpload['Status__c'] = np.where(lineItemUpload['Status__c'] == 'Not Available',' ',lineItemUpload['Status__c'])
+
+login = sfi.instance_login(sandbox)
+line_item_upload = sfi.cleaning_pandas(lineItemUpload)
+line_item_results = sfi.insert_job(login, "OpportunityLineItem",line_item_upload)
+print(line_item_results)
 
 time.sleep(5)
-cp.callUploadLineItems(cp.opDir)
+#cp.callUploadLineItems(cp.opDir)
 
 '''
 Step 7 - Clean up and Logging
@@ -160,7 +194,7 @@ Step 7 - Clean up and Logging
         -Wrap the uploaded contacts,opps, and non-confidential info into a google sheet for review
 '''
 
-logs.general_logs(theTime['time'],contact)
+#logs.general_logs(theTime['time'],contact)
 
 
 
@@ -170,13 +204,21 @@ Step 8
    - For each Contact record userid that is verified in salesforce, add that userid to a list
    - Use those userids to update the contact table and turn the downloaded field from 0 to 1
 '''
-cp.callDownloadContact(cp.opDir)
-contactDownload = pd.read_csv(r"c:\temp\NWFB\downloads\contacts\contact.csv",sep=',',encoding='iso-8859-1')
 
+commited_ids_list = str(opportunityId.index.tolist())[1:-1]
+
+
+
+
+c_bulk, c_batch = sfq.bulk_query('Contact',sfq.ending_contact_query.format(commited_ids_list) ,sandbox)
+commited_contacts = sfq.format_dictionary(c_bulk,c_batch)
+print(commited_contacts)
 '''Pull Contacts Again '''
+
+
 cursor2 = db.connect_to_db(db.host_name, db.user_name, db.pass_word, db.database, db.charset, db.cursorclass)
 
-update_values = db.upload_verification(contact,contactDownload)
+update_values = db.upload_verification(contactIDs,commited_contacts)
 
 update_log = db.upload_db_update(update_values,cursor2)
 
@@ -184,3 +226,12 @@ update_log = db.upload_db_update(update_values,cursor2)
 #Create a spreadsheet that will hold all of the updates values...
 
 
+
+
+#for index, item in targets.iterrows():
+ #   for col in contact:
+  #      if item.Columns == col:
+   #         print(item.Columns + ' ' + col)
+    #        targets.loc[index,'match'] = 1
+     #   else:
+      #      pass
