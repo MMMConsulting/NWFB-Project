@@ -79,7 +79,7 @@ def select_client_records(cursor):
         downloadTime = time.time()
         downloadTime = datetime.datetime.fromtimestamp(downloadTime).strftime('%Y-%m-%d %H:%M:%S')
         print(downloadTime)
-        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE birthdate >= '1900-01-01' AND DOWNLOADED = 0 AND LENGTH(CASEWORKERNAME) > 4;"
+        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE birthdate >= '1900-01-01' AND DOWNLOADED = 0 AND LENGTH(CASEWORKERNAME) > 4 LIMIT 10;"
 #        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE ID = 99;"
    
         print(furniture_query)
@@ -162,8 +162,8 @@ def upload_verification(contact_df,client_query_output):
     update_values = []
     for index, row in contact_df.iterrows():
         for index2, row2 in client_query_output.iterrows():
-            if row['ID'] == row2['SIGNUP_ID__C']:
-                update_values.insert(0,row['ID'])
+            if row['signup_id__c'] == row2['signup_id__c']:
+                update_values.insert(0,row['signup_id__c'])
     return update_values
 
 #Accepts the list from upload_verification and set the downloaded field from 0 to 1
