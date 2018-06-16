@@ -63,7 +63,7 @@ def select_client_records(cursor):
         downloadTime = time.time()
         downloadTime = datetime.datetime.fromtimestamp(downloadTime).strftime('%Y-%m-%d %H:%M:%S')
         print(downloadTime)
-        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests;"
+        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE downloaded = 0;"
         print(furniture_query)
         cursor.execute(furniture_query)
         row_values = []
@@ -138,7 +138,7 @@ records = select_client_records(cur)
 #furniture_records = select_furniture_records(cur)
 
 #furniture.to_csv(r"C:/users/marti/desktop/test_db_output.csv",sep=',',encoding = 'iso-8859-1')
-#records.to_csv(r"C:/users/micha/desktop/test_db_output_records.csv",sep=',',encoding = 'iso-8859-1')
+records.to_csv(r"C:/users/micha/desktop/test_db_output_records.csv",sep=',',encoding = 'iso-8859-1')
 
 # Matches records that have been produced through the webapp sign up flow to those in salesforce and produces a list
 def upload_verification(contact_df,client_query_output):
