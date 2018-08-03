@@ -91,9 +91,24 @@ contact.to_csv(r"C:\temp\NWFB\uploads\contacts\contactsFile.csv",sep=',',encodin
 #contact = contact[contact_upload['to_be_dropped'] == 0]
 
 contact_upload = contact.drop(['CloseDate','to_be_dropped'], axis = 1)
-
 ''' remove contacts already in the system''' 
 
+
+''' remove records whose caseworker has been deleted'''
+cw_bulk, cw_batch = sfq.bulk_query('Contact',sfq.prod_full_caseworker_query,sandbox)
+caseworkers = sfq.format_dictionary(cw_bulk,cw_batch)
+
+for idx, row in contact_upload.iterrows():
+    for index, item in caseworkers.iterrows():
+        if str(row.Caseworker_Name__c) == str(item.Id):
+            print('match')
+            contact_upload.loc[idx,'to_be_dropped2'] = 0
+            next
+        else:
+            pass
+
+contact_upload = contact_upload[contact_upload.to_be_dropped2 == 0]
+contact_upload = contact_upload.drop(['to_be_dropped2'], axis = 1)
 
 login = sfi.instance_login(sandbox)
 contact_upload = sfi.cleaning_pandas(contact_upload)
