@@ -79,7 +79,7 @@ def select_client_records(cursor):
         downloadTime = time.time()
         downloadTime = datetime.datetime.fromtimestamp(downloadTime).strftime('%Y-%m-%d %H:%M:%S')
         print(downloadTime)
-        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE birthdate >= '1900-01-01' AND DOWNLOADED = 0 AND LENGTH(CASEWORKERNAME) > 4 LIMIT 10;"
+        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE birthdate >= '1900-01-01' AND DOWNLOADED = 0 AND LENGTH(CASEWORKERNAME) > 4 ORDER BY SUBMITTED_DATETIME DESC LIMIT 10 ;"
 #        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE ID = 99;"
    
         print(furniture_query)
