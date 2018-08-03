@@ -211,14 +211,14 @@ def contactFormat(dataset):
 #            contactRecord.loc[index2,'Paid__c'] = 'Pending'
 #        else:
 #            contactRecord.loc[index2,'Paid__c'] = 'Invoicing'
-        if (contactRecord.loc[index2,'Paid_by_Client__c'] != ' ') == True & ((contactRecord.loc[index2,'Paid_by_Agency__c'] != ' ') == True | (contactRecord.loc[index2,'Other_Contact_1__c'] != 0)) == True:
+        if (contactRecord.loc[index2,'Paid_by_Client__c'] != 0) == True & ((contactRecord.loc[index2,'Paid_by_Agency__c'] != 0) == True | (contactRecord.loc[index2,'Other_Contact_1__c'] != 0)) == True:
             contactRecord.loc[index2,'Paid_By__c'] = 'Client and Agency'
-        elif contactRecord.loc[index2,'Paid_by_Client__c'] != ' ':
+        elif contactRecord.loc[index2,'Paid_by_Client__c'] != 0:
             contactRecord.loc[index2,'Paid_By__c'] = 'Client'
-            contactRecord.loc[index2,'Paid_by_Agency__c'] = ''
-        elif (contactRecord.loc[index2,'Paid_by_Agency__c'] != ' ') == True | (contactRecord.loc[index2,'Other_Contact_1__c'] != 0) == True:
+            contactRecord.loc[index2,'Paid_by_Agency__c'] = 0
+        elif (contactRecord.loc[index2,'Paid_by_Agency__c'] != 0) == True | (contactRecord.loc[index2,'Other_Contact_1__c'] != 0) == True:
             contactRecord.loc[index2,'Paid_By__c'] = 'Agency'
-            contactRecord.loc[index2,'Paid_by_Client__c'] = ''
+            contactRecord.loc[index2,'Paid_by_Client__c'] = 0
         else:
 #            contactRecord.loc[index2,'Paid_by__c'] = 'We have a problem' #remove in the production version
             print('we have a problem')
