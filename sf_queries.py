@@ -26,7 +26,9 @@ prod_contact_query2 = "Select Id,AccountId, LastName,  Name,Phone,HomePhone,Emai
 initial_contact_query = "Select Id, signup_id__c FROM Contact WHERE recordtypeid = '012A0000000GPtUIAW' AND signup_id__c != NULL"
 ending_contact_query = "Select Id, signup_id__c FROM Contact WHERE recordtypeid = '012A0000000GPtUIAW' AND signup_id__c in ({0})"
 
+
 ''' create dynamic version of these queries that pulls records created in last 10 minutes'''
+prod_full_caseworker_query = "Select Id,AccountId, Name,CreatedDate,signup_id__c FROM Contact WHERE recordtypeid = '012A0000000GPtKIAW' AND IsDeleted = FALSE"
 prod_caseworker_query = "Select Id,AccountId, Name,CreatedDate,signup_id__c FROM Contact WHERE recordtypeid = '012A0000000GPtKIAW' AND CreatedDate = TODAY AND signup_id__c != NULL"
 prod_opportunity_query = "Select Id, formattedPhoneNumber__c, CreatedDate, signup_id__c FROM Opportunity WHERE signup_id__c != NULL AND CREATEDDATE >= {0}".format(now_time)
 test_opportunity_query = "Select Id, formattedPhoneNumber__c, CreatedDate, signup_id__c, closedate, Delivery_Date__c  FROM opportunity"
