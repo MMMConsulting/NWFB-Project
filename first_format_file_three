@@ -235,6 +235,19 @@ def contactFormat(dataset):
             contactRecord.loc[ix,'Homeless_In_The_Last_Month__c'] = 'true'
         else:
             contactRecord.loc[ix,'Homeless_In_The_Last_Month__c'] = 'false'
+    for ix, item in contactRecord.iterrows():
+        if (item['Delivery_Street__c'] == '') == True  or (item['Delivery_Street__c'] == ' ') == True or (item['Delivery_Street__c'] == '  ') == True:
+            contactRecord.loc[ix, 'Delivery_Street__c'] = contactRecord.loc[ix, 'MailingStreet']
+        else:
+            pass
+        if item['Delivery_City__c'] == '':
+            contactRecord.loc[ix, 'Delivery_City__c'] = contactRecord.loc[ix, 'MailingCity']
+        else:
+            pass
+        if item['Delivery_Zip__c'] == '':
+            contactRecord.loc[ix, 'Delivery_Zip__c'] = contactRecord.loc[ix, 'MailingPostalCode']
+        else:
+            pass
 
     return contactRecord
 
