@@ -54,11 +54,10 @@ for idx, row in dataSet.iterrows():
         else:
             pass
 
-
-
+    
 if len(dataSet[dataSet['to_be_dropped'] == 0]) == 0:
     print("No new records... Closing Application")
-    theTime.to_csv(r"c:/users/martimi/desktop/thetime.csv",sep=',',encoding='8859-1')
+#    theTime.to_csv(r"c:/users/martimi/desktop/thetime.csv",sep=',',encoding='8859-1')
     exit()
 else:
     print("Running Application")
@@ -93,7 +92,6 @@ contact.to_csv(r"C:\temp\NWFB\uploads\contacts\contactsFile.csv",sep=',',encodin
 contact_upload = contact.drop(['CloseDate','to_be_dropped'], axis = 1)
 ''' remove contacts already in the system''' 
 
-
 ''' remove records whose caseworker has been deleted'''
 cw_bulk, cw_batch = sfq.bulk_query('Contact',sfq.prod_full_caseworker_query,sandbox)
 caseworkers = sfq.format_dictionary(cw_bulk,cw_batch)
@@ -109,6 +107,17 @@ for idx, row in contact_upload.iterrows():
 
 contact_upload = contact_upload[contact_upload.to_be_dropped2 == 0]
 contact_upload = contact_upload.drop(['to_be_dropped2'], axis = 1)
+
+drop_columns = []
+for column in contact_upload:
+    for ix, item in contact_upload.iterrows():
+        if item[column] == '':
+            drop_columns.insert(0,column)
+        else:
+            pass
+
+contact_upload = contact_upload.drop(drop_columns, axis = 1)
+
 
 login = sfi.instance_login(sandbox)
 contact_upload = sfi.cleaning_pandas(contact_upload)
@@ -142,7 +151,7 @@ contactIDs.to_csv(r"c:\temp\NWFB\downloads\contacts\contact.csv",sep=',',encodin
 
 
 opportunityUpload = fff.opportunityFormat(contactIDs)
-
+opportunityUpload
 
 #opportunityUpload.to_csv(r"C:\temp\NWFB\uploads\transaction\transaction.csv",sep=',',encoding = 'iso-8859-1')
 
