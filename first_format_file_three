@@ -22,9 +22,6 @@ Paid_By__c = Client | Agency | Client and Agency
 Number_of_Household_Adults__c = Total Served - Number of CHildren
 Other_Contact_1_Relation__c = Provide this field if there is a value in the Other Payee field
 '''
-#import caseworker list --Ideally point the program at the mySQL tables
-caseWorkers = pd.read_csv(r"c:/temp/NWFB/sampleData/contactData.csv",sep=',',encoding = 'iso-8859-1', low_memory=False)
-agencies = pd.read_csv(r"c:/temp/NWFB/sampleData/agencyExtract.csv",sep=',',encoding = 'iso-8859-1',low_memory=False)
 
 def phoneIndex(number):
     outputNumber = number.replace('(','')
