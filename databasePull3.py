@@ -39,13 +39,13 @@ a = conn.cursor()
 #a.execute("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='nwfurnit_furniturerequests' AND TABLE_NAME='furniture_requests'")
 #a.execute("SELECT * FROM nwfurnit_furniturerequests.furniture_requests ORDER BY CREATED DESC LIMIT 1;")
 #a.execute("SELECT * FROM nwfurnit_furniturerequests.furniture_requests WHERE ID = 95 AND LENGTH(FIRSTNAME) > 0 AND LENGTH(CaseworkerName) > 5 AND DOWNLOADED = 0 ;")
-#a.execute("SELECT * FROM nwfurnit_furniturerequests.furniture_requests_items WHERE ID = 280;")
-a.execute("SELECT LAST_UPDATED FROM nwdblive_furniturerequests.furniture_requests WHERE downloaded = 0;")
+#a.execute("SELECT ID, DOWNLOADED FROM nwdblive_furniturerequests.furniture_requests WHERE ID = 1399;")
+#a.execute("SELECT LAST_UPDATED FROM nwdblive_furniturerequests.furniture_requests WHERE downloaded = 0;")
 #a.execute("SHOW PROCESSLIST")
 #a.execute("KILL 311545;")
 #a.execute("UPDATE nwfurnit_furniturerequests.furniture_requests SET BirthDate = '1977-06-25' WHERE ID = 95; COMMIT;")
 #a.execute("UPDATE nwfurnit_furniturerequests.furniture_requests SET AgencyId = '001A000001RJMbGIAX',CaseworkerId = '003A000001xAcDN' WHERE downloaded = 0")
-#a.execute("UPDATE nwfurnit_furniturerequests.furniture_requests SET downloaded = 0 WHERE ID in ('12','13'); COMMIT;")
+#a.execute("UPDATE nwdblive_furniturerequests.furniture_requests SET downloaded = 0 WHERE ID in ('1399'); COMMIT;")
 
 #outputlist = []
 #for row in a:
@@ -61,7 +61,7 @@ a.execute("SELECT LAST_UPDATED FROM nwdblive_furniturerequests.furniture_request
 
 
 def fetch_last_run_time():
-    outputfile = pd.read_csv(r"c:/temp/NWFB/generallog/log.csv",sep=',',encoding='iso-8859-1')
+    outputfile = pd.read_csv(r"C:/temp/NWFB/generallog/log.csv",sep=',',encoding='iso-8859-1')
     print(outputfile.loc[len(outputfile)-1,'LastRun'])
     last_run_time = outputfile.loc[len(outputfile)-1,'LastRun']
     return last_run_time
@@ -176,7 +176,8 @@ def upload_db_update(update_values,cursor):
     print(upload_string)
     print("UPDATE nwdblive_furniturerequests.furniture_requests SET DOWNLOADED = 1 WHERE ID in ({0});".format(upload_string[:-1]))
 
-    cursor.execute("UPDATE nwdblive_furniturerequests.furniture_requests SET DOWNLOADED = 1 WHERE ID in ({0}); COMMIT;".format(upload_string[:-1]))
+    cursor.execute("UPDATE nwdblive_furniturerequests.furniture_requests SET DOWNLOADED = 1 WHERE ID in ({0});".format(upload_string[:-1]))
+    cursor.execute("COMMIT;")
     update_log = cursor.execute("Select ID, downloaded FROM nwdblive_furniturerequests.furniture_requests WHERE ID in ({0});".format(upload_string[:-1]))
     for a in cursor:
         print(a)
