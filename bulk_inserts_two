@@ -41,27 +41,28 @@ def cleaning_pandas(dataframe):
 
 
 def insert_job(creds, sf_object, dataset):
-    results = 0
-    wait = 15
     #try:
-    print('ya made it here kid')
+#    print('ya made it here kid')
     job = creds.create_insert_job(sf_object, contentType='JSON', concurrency='Serial')
     cont_dict = dataset.to_json(orient = 'records')
-    print('oi keep going')
+#    print('oi keep going')
     csv_iter = iter(cont_dict)
     batch = creds.post_batch(job, csv_iter)
-    print('i member atst')
+#    print('i member atst')
     print(creds.batch_status(batch))
-    print('error there')
+#    print('error there')
 #        for i in range(wait):
  #           time.sleep(1)
   #          print(creds.batch_status(batch))
 #        results = creds.batch_status(batch)
 #        time.sleep(10)
-    print('error here')
+#    print('error here')
     creds.wait_for_batch(job, batch)
     results = creds.batch_status(batch)
-    print('maybe error here')
+    results2 = creds.get_batch_results(batch)
+
+#    print('maybe error here')
+    print(results2)
     creds.close_job(job)
     print(sf_object + "s " + "Insert Job Complete")
     return results
