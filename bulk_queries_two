@@ -24,11 +24,17 @@ test_contact_query = "Select Id,AccountId,Name,Phone,HomePhone,Email,Caseworker_
 prod_contact_query = "Select Id,AccountId, LastName,  Name,Phone,HomePhone,Email,Caseworker_Name__c,Delivery__c, CreatedDate,signup_id__c FROM Contact WHERE recordtypeid = '012A0000000GPtUIAW' AND createddate >= {0}".format(now_time)
 prod_contact_query2 = "Select Id,AccountId, LastName,  Name,Phone,HomePhone,Email,Caseworker_Name__c,Delivery__c, CreatedDate,signup_id__c FROM Contact WHERE recordtypeid = '012A0000000GPtUIAW' "
 initial_contact_query = "Select Id, signup_id__c FROM Contact WHERE recordtypeid = '012A0000000GPtUIAW' AND signup_id__c != NULL"
+ending_contact_query = "Select Id, signup_id__c FROM Contact WHERE recordtypeid = '012A0000000GPtUIAW' AND signup_id__c in ({0})"
+
+
 ''' create dynamic version of these queries that pulls records created in last 10 minutes'''
+prod_full_caseworker_query = "Select Id,AccountId, Name,CreatedDate,signup_id__c FROM Contact WHERE recordtypeid = '012A0000000GPtKIAW' AND IsDeleted = FALSE"
 prod_caseworker_query = "Select Id,AccountId, Name,CreatedDate,signup_id__c FROM Contact WHERE recordtypeid = '012A0000000GPtKIAW' AND CreatedDate = TODAY AND signup_id__c != NULL"
 prod_opportunity_query = "Select Id, formattedPhoneNumber__c, CreatedDate, signup_id__c FROM Opportunity WHERE signup_id__c != NULL AND CREATEDDATE >= {0}".format(now_time)
 test_opportunity_query = "Select Id, formattedPhoneNumber__c, CreatedDate, signup_id__c, closedate, Delivery_Date__c  FROM opportunity"
-lineitem_query = "Select * from opportunitylineitem WHERE createddate >= 2018-05-21T00:00:00Z"
+lineitem_query = "Select Id, OpportunityId,  from opportunitylineitem WHERE CREATEDDATE >= {0}".format(now_time)
+
+
 
 #bulk = SalesforceBulk(username='admin@havensconsulting.net',password='91dU9hsKZdkz',security_token='ATLclvPX1UFxT05UZMIHrAkM')
 #bulk = SalesforceBulk(username='michael@havensconsulting.net.mikesde',password='P@tersin1',sandbox=True, security_token='K7FjFIUW3KuMXKFthijArNDFP')
@@ -81,7 +87,7 @@ def format_dictionary(bulk,batch):
     print(str(len(data_set)) + " Rows of data processed") 
     return output    
 
-#c_bulk, c_batch = bulk_query('Opportunity',prod_opportunity_query,sandbox=True)
-#contacts = format_dictionary(c_bulk,c_batch)
-
+c_bulk, c_batch = bulk_query('Opportunity',test_contact_query,sandbox = False)
+contacts = format_dictionary(c_bulk,c_batch)
+contacts.to_csv(r"c:/users/micha/desktop/contacts-11-13.csv")
 
