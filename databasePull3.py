@@ -79,7 +79,7 @@ def select_client_records(cursor):
         downloadTime = time.time()
         downloadTime = datetime.datetime.fromtimestamp(downloadTime).strftime('%Y-%m-%d %H:%M:%S')
         print(downloadTime)
-        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE birthdate >= '1900-01-01' AND DOWNLOADED = 0 AND LENGTH(CASEWORKERNAME) > 4 AND Id != 1022 ORDER BY SUBMITTED_DATETIME DESC;"
+        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE birthdate >= '1900-01-01' AND DOWNLOADED = 0  AND LENGTH(CASEWORKERNAME) > 4 AND Id != 1022 ORDER BY SUBMITTED_DATETIME DESC LIMIT 5;"
 #        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE ID = 99;"
    
         print(furniture_query)
@@ -96,9 +96,9 @@ def select_client_records(cursor):
             column_values.insert(0,item2)
         outputdf = df(data = output_data, columns = column_values)
         for index, row in outputdf.iterrows():
-            if type(row['WILL_CALL_DELIVERY_DATE']) != pd._libs.tslib.NaTType and row['WILL_CALL_DELIVERY_DATE'] != '0000-00-00' and row['WILL_CALL_DELIVERY_DATE'] != None:
+            if type(row['WILL_CALL_DELIVERY_DATE']) != pd._libs.tslib.NaT and row['WILL_CALL_DELIVERY_DATE'] != '0000-00-00' and row['WILL_CALL_DELIVERY_DATE'] != None:
                 outputdf.loc[index,'CloseDate'] = str(str(row.WILL_CALL_DELIVERY_DATE.year)+'-'+str(row.WILL_CALL_DELIVERY_DATE.month)+'-'+str(row.WILL_CALL_DELIVERY_DATE.day))
-            elif type(row['DELIVERY_DATE']) != pd._libs.tslib.NaTType and row['DELIVERY_DATE'] != '0000-00-00' and row['DELIVERY_DATE'] != 'None' and row['DELIVERY_DATE'] != None:
+            elif type(row['DELIVERY_DATE']) != pd._libs.tslib.NaT and row['DELIVERY_DATE'] != '0000-00-00' and row['DELIVERY_DATE'] != 'None' and row['DELIVERY_DATE'] != None:
                 outputdf.loc[index,'CloseDate'] = str(str(row.DELIVERY_DATE.year)+'-'+str(row.DELIVERY_DATE.month)+'-'+str(row.DELIVERY_DATE.day))
             elif row['SHOP_DATE'] != None and row['SHOP_DATE'] != '0000-00-00':
                 print(row.SHOP_DATE)
