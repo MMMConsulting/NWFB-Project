@@ -13,9 +13,14 @@ import datetime
 from pandas import DataFrame as df
 import sys
 
+MikesDE = 'michael@havensconsulting.net.MikesDE'
+mikes_dst = 'K7FjFIUW3KuMXKFthijArNDFP'
+DevSandbox = 'michael@havensconsulting.net.devsandbox'
+dst = 'phkRjgCdMQpkuaDkvv4YKxwpy'
 
 now = datetime.datetime.now()
 now_minus_five = now - datetime.timedelta(minutes=2)
+#now_plus_seven = now_minus_five + datetime.timedelta(hours=8)
 now_plus_seven = now_minus_five + datetime.timedelta(hours=7)
 now_time = str(now_plus_seven)[0:10] + "T" + str(now_plus_seven)[11:19] + "Z"
 
@@ -44,7 +49,7 @@ Queries
 '''
 def bulk_query(SF_object, query, sandbox):
     if sandbox == True:
-        bulk = SalesforceBulk(username='michael@havensconsulting.net.mikesde',password='P@tersin1',sandbox=True, security_token='K7FjFIUW3KuMXKFthijArNDFP')
+        bulk = SalesforceBulk(username=DevSandbox,password='P@tersin1',sandbox=True, security_token=dst)
         print("Querying sandbox")
     elif sandbox == False:
         bulk = SalesforceBulk(username='admin@havensconsulting.net',password='91dU9hsKZdkz',security_token='ATLclvPX1UFxT05UZMIHrAkM')
@@ -87,7 +92,11 @@ def format_dictionary(bulk,batch):
     print(str(len(data_set)) + " Rows of data processed") 
     return output    
 
-c_bulk, c_batch = bulk_query('Opportunity',test_contact_query,sandbox = False)
+c_bulk, c_batch = bulk_query('Contact',test_contact_query,sandbox = False)
 contacts = format_dictionary(c_bulk,c_batch)
 contacts.to_csv(r"c:/users/micha/desktop/contacts-11-13.csv")
+
+#c_bulk, c_batch = bulk_query('Opportunity',test_opportunity_query,sandbox = False)
+#opportunity = format_dictionary(c_bulk,c_batch)
+#opportunity.to_csv(r"c:/users/micha/desktop/opportunity-11-13.csv")
 
