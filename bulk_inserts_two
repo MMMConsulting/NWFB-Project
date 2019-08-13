@@ -15,11 +15,14 @@ from pandas import DataFrame as df
 #prod_bulk = SalesforceBulk(username='admin@havensconsulting.net',password='91dU9hsKZdkz',security_token='ATLclvPX1UFxT05UZMIHrAkM')
 #test_bulk = SalesforceBulk(username='michael@havensconsulting.net.mikesde',password='P@tersin1',sandbox=True, security_token='K7FjFIUW3KuMXKFthijArNDFP')#
 #account = pd.read_csv(r"C:\Users\micha\Desktop\accounts_for_sandbox.csv")
-
+MikesDE = 'michael@havensconsulting.net.MikesDE'
+mikes_dst = 'K7FjFIUW3KuMXKFthijArNDFP'
+DevSandbox = 'michael@havensconsulting.net.devsandbox'
+dst = 'phkRjgCdMQpkuaDkvv4YKxwpy'
 
 def instance_login(sandbox):
     if sandbox == True:
-        creds = SalesforceBulk(username='michael@havensconsulting.net.mikesde',password='P@tersin1',sandbox=True, security_token='K7FjFIUW3KuMXKFthijArNDFP')
+        creds = SalesforceBulk(username=DevSandbox,password='P@tersin1',sandbox=True, security_token=dst)
         print("Sandbox Login Successful!")
     elif sandbox == False:
         creds = SalesforceBulk(username='admin@havensconsulting.net',password='91dU9hsKZdkz',security_token='ATLclvPX1UFxT05UZMIHrAkM')

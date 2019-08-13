@@ -10,11 +10,12 @@ Call map for all scripts involved in the Webform to Salesforce automation
 
 import sys
 sys.path.append('c:/temp/NWFB/scripts/etl')
-
+#sys.path.append('c:/Users/MikeM/Documents/NWFB/scripts/etl') #For Server
 import numpy as np
 import pandas as pd
 from pandas import DataFrame as df
 import logs, databasePull3 as db, sf_queries as sfq, sf_inserts as sfi, lineItemScriptv3 as lis, firstFormatFile_two as fff
+#import logs, databasePull3_sp as db, sf_queries as sfq, sf_inserts as sfi, lineItemScriptv3_server as lis, firstFormatFile_two as fff
 import time 
 import datetime
 
