@@ -67,6 +67,7 @@ def contactFormat(dataset):
                                 ,'Veteran__c':''
                                 ,'Primary_Reason__c':''
                                 ,'Birthdate':''
+                                ,'Location__c':''
                                 ,'Race__c':''
                                 ,'Gender__c':''
                                 ,'Children__c':''
@@ -208,6 +209,13 @@ def contactFormat(dataset):
 #            contactRecord.loc[index2,'Paid__c'] = 'Pending'
 #        else:
 #            contactRecord.loc[index2,'Paid__c'] = 'Invoicing'
+        if dataset.loc[index2,'DBA'] == 1:
+            contactRecord.loc[index2,'Location__c'] = 'Tacoma'
+        elif dataset.loc[index2,'DBA'] == 2:
+            contactRecord.loc[index2,'Location__c'] = 'Vancouver'
+        else:
+            contactRecord.loc[index2,'Location__c'] = 'NULL'
+            
         if (contactRecord.loc[index2,'Paid_by_Client__c'] != 0) == True & ((contactRecord.loc[index2,'Paid_by_Agency__c'] != 0) == True | (contactRecord.loc[index2,'Other_Contact_1__c'] != 0)) == True:
             contactRecord.loc[index2,'Paid_By__c'] = 'Client and Agency'
         elif contactRecord.loc[index2,'Paid_by_Client__c'] != 0:
