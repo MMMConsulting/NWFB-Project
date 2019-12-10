@@ -79,7 +79,7 @@ def select_client_records(cursor):
         downloadTime = time.time()
         downloadTime = datetime.datetime.fromtimestamp(downloadTime).strftime('%Y-%m-%d %H:%M:%S')
         print(downloadTime)
-        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE birthdate >= '1900-01-01' AND DOWNLOADED = 0  AND LENGTH(CASEWORKERNAME) > 4 AND Id != 1022 ORDER BY SUBMITTED_DATETIME DESC LIMIT 5;"
+        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE birthdate >= '1900-01-01' AND WILL_CALL_DELIVERY_DATE > '1900-01-01' AND DELIVERY_DATE > '1900-01-01' AND DOWNLOADED = 0  AND LENGTH(CASEWORKERNAME) > 4 AND Id != 1022 ORDER BY SUBMITTED_DATETIME DESC LIMIT 15;"
 #        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests WHERE ID = 99;"
    
         print(furniture_query)
@@ -114,7 +114,7 @@ def select_client_records(cursor):
         print("closing program")
         theTime = df(columns = {'time'})
         theTime['time'] = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        theTime.to_csv(r"c:/users/marti/desktop/thetime.csv",sep=',',encoding='iso-8859-1')
+#        theTime.to_csv(r"c:/users/marti/desktop/thetime.csv",sep=',',encoding='iso-8859-1')
         sys.exit()
     return outputdf
 
@@ -124,7 +124,7 @@ def select_furniture_records(cursor):
         downloadTime = time.time()
         downloadTime = datetime.datetime.fromtimestamp(downloadTime).strftime('%Y-%m-%d %H:%M:%S')
         print(downloadTime)
-        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests_items WHERE REQUESTED > 0;"
+        furniture_query = "SELECT * FROM nwdblive_furniturerequests.furniture_requests_items WHERE REQUESTED > 0 OR PROVIDED > 0;"
         print(furniture_query)
         cursor.execute(furniture_query)
         row_values = []
@@ -183,3 +183,7 @@ def upload_db_update(update_values,cursor):
         print(a)
     cursor.close()
     return update_log
+
+#update_values = ['4451','4513','4528','4533','4536','4549','4560','4570','4584','4586','4596','4610','4615','4659','4699']
+
+#b = upload_db_update(update_values,a)
