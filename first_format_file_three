@@ -170,7 +170,7 @@ def contactFormat(dataset):
         
         ''' WILL CALL INFO '''
         contactRecord.loc[index2,'Will_Call_Tag_Delivery__c'] = dataset.loc[index2,'WILL_CALL_DELIVERY_TAG_COLOR']
-        contactRecord.loc[index2,'Will_Call_Delivery_Date__c'] = dataset.loc[index2,'WILL_CALL_DELIVERY_DATE']
+        contactRecord.loc[index2,'Will_Call_Delivery_Date__c'] = np.where(pd.isnull(dataset.loc[index2,'DELIVERY_DATE']) == True,dataset.loc[index2,'WILL_CALL_DELIVERY_DATE'],dataset.loc[index2,'DELIVERY_DATE'])
         contactRecord.loc[index2,'Will_Call_Delivery_Notes__c'] = dataset.loc[index2,'WILL_CALL_DELIVERY_NOTES']
         contactRecord.loc[index2,'Will_Call_Delivery_Loaded_By__c'] = dataset.loc[index2,'WILL_CALL_DELIVERY_LOADED_BY']
         contactRecord.loc[index2,'Will_Call_Delivery__c'] = dataset.loc[index2,'WILL_CALL_DELIVERY_DELIVERED_BY']
@@ -253,6 +253,25 @@ def contactFormat(dataset):
             contactRecord.loc[ix, 'Delivery_Zip__c'] = contactRecord.loc[ix, 'MailingPostalCode']
         else:
             pass
+
+    '''Delivery Date Info'''
+#    for ix, item in contactRecord.iterrows():
+#        if (pd.isnull(item.Delivery_Date__c) == True) ==  True | (item.Delivery_Date__c == '') == True:
+#            contactRecord.loc[ix,'Delivery_Date__c'] = item.Will_Call_Delivery_Date__c
+#        else:
+#            pass
+#        stage = str(item.MailingCity)
+#        if stage.find(',') > 0:
+#            contactRecord.loc[ix,'MailingCity'] = item.MailingCity[0:stage.find(',')]
+#        else:
+#            pass
+#    for ix, item in contactRecord.iterrows():
+#        stage = str(item.Delivery_City__c)
+#        if stage.find(',') > 0:
+#            contactRecord.loc[ix,'Delivery_City__c'] = item.Delivery_City__c[0:stage.find(',')]
+#        else:
+#            pass        
+            
 
     return contactRecord
 
